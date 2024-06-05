@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/');
     },
     filename:function(req,res,cb){
-        cb(null, Date.now() + path.extname(file.orginalname));
+        cb(null, Date.now() + path.extname(file.originalname));
     }
   })
 
@@ -62,4 +62,9 @@ const deleteFirmById = async(req,res)=>{
   }
 
 
-module.exports ={addFirm:[upload.single('image'),addFirm],deleteFirmById}
+// module.exports ={addFirm:[upload.single('image'),addFirm],deleteFirmById}
+
+module.exports = {
+  addFirm: [upload.single('image'), addFirm], // Ensure middleware is correctly applied
+  deleteFirmById
+};
