@@ -74,6 +74,7 @@ const deleteProductById = async (req, res) => {
     if (!deleteProductId) {
       return res.status(404).json({ error: "No product found" });
     }
+    res.status(200).json(deleteProductId);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "internal server  error" });
