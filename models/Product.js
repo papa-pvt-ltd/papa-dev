@@ -9,12 +9,12 @@ const ProductSchema = mongoose.Schema({
         type:String,
         required:true
     },
-    catogery:[{
+    category:[{
         type:String,
         enum:['toys','apperals','chepals']
     }],
     bestseller:{
-        type:String
+        type:Boolean
     },
     description:{
         type:String,

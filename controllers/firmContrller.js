@@ -1,15 +1,15 @@
-const multer = require('multer');
-const Firm = require('../models/Firm');
-const Vender = require('../models/Vender');
-const path = require('path');
+const multer = require("multer");
+const Firm = require("../models/Firm");
+const Vender = require("../models/Vender");
+const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
-  }
+  },
 });
 
 const upload = multer({ storage: storage });
@@ -25,19 +25,25 @@ const addFirm = async (req, res) => {
       return res.status(404).json({ message: "Vender not found" });
     }
 
+    // if (vender.firm.length > 0) {
+    //   return res.status(400).json({ message: "Vender can have only one firm" });
+    // }
+
     const firm = new Firm({
       brandName,
       category,
       offer,
       image,
-      vender: vender._id
+      vender: vender._id,
     });
 
     const savedFirm = await firm.save();
     vender.firm.push(savedFirm);
     await vender.save();
 
-    return res.status(200).json({ message: "Firm added successfully" });
+    return res
+      .status(200)
+      .json({ message: "Firm added successfully", firmId: savedFirm._id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -62,6 +68,6 @@ const deleteFirmById = async (req, res) => {
 };
 
 module.exports = {
-  addFirm: [upload.single('image'), addFirm],
-  deleteFirmById
+  addFirm: [upload.single("image"), addFirm],
+  deleteFirmById,
 };
