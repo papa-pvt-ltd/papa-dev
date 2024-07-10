@@ -1,28 +1,28 @@
 const express = require("express");
-const Vender = require("../models/Vender");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv");
+const User = require("../models/User")
 
 dotenv.config();
 
-const SecretKey = process.env.whatIsYourCompany;
+const SecretKey = process.env.WhatIsUserName;
 
-const venderRegister = async (req, res) => {
+const userRegister = async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    const venderEmail = await Vender.findOne({ email });
-    if (venderEmail) {
+    const userEmail = await User.findOne({ email });
+    if (userEmail) {
       return res.status(400).json("email already taken");
     }
     const hashPassword = await bcrypt.hash(password, 10);
 
-    const newVender = new Vender({
+    const newUser = new User({
       username,
       email,
       password: hashPassword,
     });
-    await newVender.save();
+    await newUser.save();
 
     res.status(200).json({ message: "register succuesfully...!" });
     console.log("Register");
@@ -32,21 +32,21 @@ const venderRegister = async (req, res) => {
   }
 };
 
-const venderLogin = async (req, res) => {
+const userLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const vender = await Vender.findOne({ email });
-    if (!vender || !(await bcrypt.compare(password, vender.password))) {
+    const user = await User.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: "invalid username or password" });
     }
 
-    const token = jwt.sign({ venderId: vender._id }, SecretKey, {
+    const token = jwt.sign({ userId: user._id }, SecretKey, {
       expiresIn: "2h",
     });
 
-    const venderId = vender._id;
+    const userId = user._id;
 
-    res.status(200).json({ message: "login successfully", token, venderId });
+    res.status(200).json({ message: "login successfully", token, userId });
     console.log(email, "this is token:", token);
   } catch (error) {
     console.log(error);
@@ -54,34 +54,31 @@ const venderLogin = async (req, res) => {
   }
 };
 
-const getAllVenders = async (req, res) => {
+const getAllUsers = async (req, res) => {
   try {
-    const venders = await Vender.find().populate("firm");
-    if (!venders) {
+    const user = await User.find().populate("firm");
+    if (!user) {
       res.status(404).json({ message: "venders not found" });
     }
-    res.json({ venders });
+    res.json({ user });
   } catch (error) {
     res.status(500).json({ message: "internal server error" });
   }
 };
 
-const singleVender = async (req, res) => {
-  const venderId = req.params.venderId;
+const singleUser = async (req, res) => {
+  const userId = req.params.userId;
 
   try {
-    const singleValue = await Vender.findById(venderId).populate("firm");
+    const singleValue = await User.findById(userId).populate('Address');
     if (!singleValue) {
       res.status(404).json({ message: "vender not found" });
     }
 
-    const vendorFirmId = singleValue.firm[0]._id;
-    const VenderBrandName = singleValue.firm[0].brandName;
-    console.log(vendorFirmId);
-    res.status(200).json({ venderId, vendorFirmId,singleValue,VenderBrandName });
+    res.status(200).json({ userId, singleValue });
   } catch (error) {
     res.status(500).json({ message: "internal server error" });
   }
 };
 
-module.exports = { venderRegister, venderLogin, getAllVenders, singleVender };
+module.exports = { userRegister, userLogin, getAllUsers, singleUser };

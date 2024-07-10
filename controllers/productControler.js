@@ -17,7 +17,7 @@ const upload = multer({ storage: storage });
 
 const addProduct = async (req, res) => {
   try {
-    const { productname, price, category, bestseller, description } = req.body;
+    const { productname, price, category, bestseller, description,age , gender } = req.body;
     const image = req.file ? req.file.filename : undefined;
 
     const firmId = req.params.firmId;
@@ -34,6 +34,8 @@ const addProduct = async (req, res) => {
       bestseller,
       description,
       image,
+      age,
+      gender,
       firm: firm._id,
     });
 
@@ -45,9 +47,22 @@ const addProduct = async (req, res) => {
     res.status(200).json(savedProducts);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "internal server  error" });
+    res.status(500).json({ message: "internal age server  error" });
   }
 };
+
+
+const getAllProducts = async (req,res)=>{
+  try {
+    const products = await Product.find();
+    res.status(200).json({message:"Products fetching succesfully....!",products})
+} catch (err) {
+  console.error(err);
+  res.status(500).json({ message: "internal server  error" });
+}
+}
+
+
 
 const getProductByFirm = async (req, res) => {
   try {
@@ -84,4 +99,5 @@ module.exports = {
   addProduct: [upload.single("image"), addProduct],
   getProductByFirm,
   deleteProductById,
+  getAllProducts
 };

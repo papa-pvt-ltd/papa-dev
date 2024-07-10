@@ -37,5 +37,5 @@ type:[
 
 })
 
-const Firm =mongoose.model('firm', firmSchema)
+const Firm =mongoose.model('Firm', firmSchema)
 module.exports = Firm

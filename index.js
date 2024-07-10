@@ -5,33 +5,69 @@ const mongoose = require('mongoose');
 const firmRoutes = require("./routes/firmRoutes");
 const VenderRoute = require('./routes/venderRoute');
 const productRoute = require('./routes/productRouter');
+const userRoute = require('./routes/userRoutes');
+const cartRoute = require('./routes/cartRoutes');
+const reviewRouter = require('./routes/reviewRoutes')
+const addressRouter = require('./routes/addressRoutes')
+const orderRouter = require('./routes/orderRoutes')
+// const instance =require('./RazorpayInstence')
+
+// import paymentRoute from "./routes/paymentRoutes.js";
+const paymentRoute =require('./routes/paymentRoutes')
+
+
 const cors = require('cors');
 const path = require('path');
 
+
+
 const app = express();
+
+
 
 // Load environment variables
 dotenv.config();
 app.use(cors());
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000; // Use environment variable or default to 8000
 const MONGO_URI = process.env.MONGO_URI;
 
-// Connect to MongoDB
-mongoose.connect(MONGO_URI)
-    .then(() => console.log("DB connected successfully"))
-    .catch(err => console.log("DB connection failed", err));
-
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    // Remove useCreateIndex option
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch((error) => {
+    console.error('DB connection failed:', error.message);
+});
 // Middleware
 app.use(bodyParser.json());
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true }));
+
+
+const requireAuth = (req, res, next) => {
+    if (req.isAuthenticated()) {
+      return next(); // User is authenticated, proceed to the next middleware
+    }
+    res.redirect('/login'); // Redirect to login page if not authenticated
+  };
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/vender', VenderRoute);
+
 app.use('/firm', firmRoutes);
 app.use('/product', productRoute);
+app.use('/auth',userRoute)
+app.use('/cart',cartRoute)
+app.use('/review',reviewRouter);
+app.use("/api", paymentRoute);
+app.use('/address',addressRouter)
+app.use('/order',orderRouter)
 
 // Health Check Endpoint
 app.get('/health', (req, res) => {
@@ -53,3 +89,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`Server running successfully at ${PORT}`);
 });
+
+
