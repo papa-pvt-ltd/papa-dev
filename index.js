@@ -10,6 +10,8 @@ const cartRoute = require('./routes/cartRoutes');
 const reviewRouter = require('./routes/reviewRoutes')
 const addressRouter = require('./routes/addressRoutes')
 const orderRouter = require('./routes/orderRoutes')
+const contactRouter = require('./routes/contactRoutes')
+const wishlistRouter = require('./routes/wishlistRoutes')
 // const instance =require('./RazorpayInstence')
 
 // import paymentRoute from "./routes/paymentRoutes.js";
@@ -68,6 +70,11 @@ app.use('/review',reviewRouter);
 app.use("/api", paymentRoute);
 app.use('/address',addressRouter)
 app.use('/order',orderRouter)
+app.use('/contact',contactRouter)
+app.use('/wishlist',wishlistRouter)
+
+
+
 
 // Health Check Endpoint
 app.get('/health', (req, res) => {

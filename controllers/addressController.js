@@ -61,4 +61,57 @@ const getAddress = async (req,res)=>{
 
 }
 
-module.exports={AddAddress,getAddress};
+const deleteAddress = async (req,res)=>{
+    try {
+        const addressId = req.query.addressId;
+        const deletedAddress = await Address.findByIdAndDelete(addressId) 
+        if (!deletedAddress) {
+            return res.status(404).json({ error: "No product found" });
+          }
+          res.status(200).json(deletedAddress);        
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "internal server  error" });
+    }
+}
+
+
+const getSingleAddress = async (req,res)=>{
+    try {
+        const editaddressId = req.query.editaddressId;
+        // console.log(editaddressId)
+        const fetchSingleAddress = await Address.findById(editaddressId)     
+            
+        if (!fetchSingleAddress) {
+            return res.status(404).json({ error: "No Address found" });
+          }
+          res.status(200).json(fetchSingleAddress); 
+      
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message:"internal server error"});
+    }
+
+}
+
+const editSingleAddress = async (req, res) => {
+    try {
+        const editaddressId = req.query.editaddressId;
+        const updateData = req.body;
+
+        // Find the address by ID and update it with new data
+        const editSingleAddress = await Address.findByIdAndUpdate(editaddressId, updateData, { new: true });
+
+        if (!editSingleAddress) {
+            return res.status(404).json({ error: "No Address found" });
+        }
+
+        res.status(200).json(editSingleAddress);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "internal server error" });
+    }
+};
+
+
+module.exports={AddAddress,getAddress,deleteAddress,getSingleAddress,editSingleAddress};

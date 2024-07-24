@@ -95,9 +95,25 @@ const deleteProductById = async (req, res) => {
     res.status(500).json({ message: "internal server  error" });
   }
 };
+
+const getSingleProduct = async (req , res )=>{
+  try {
+    const productId = req.query.productId;;
+   
+    const actualProduct = await Product.findById(productId)
+    if(!actualProduct){
+      return res.status(404).json({error:"No Product Matched you provided by id"})
+    }
+    res.status(200).json(actualProduct);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "internal server  error" });
+  }
+}
 module.exports = {
   addProduct: [upload.single("image"), addProduct],
   getProductByFirm,
   deleteProductById,
-  getAllProducts
+  getAllProducts,
+  getSingleProduct
 };

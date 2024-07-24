@@ -13,6 +13,8 @@ router.get('/uploads/:imageName',(req,res)=>{
 })
 
 router.get('/allProducts',productControler.getAllProducts);
+router.get('/singleproduct',productControler.getSingleProduct);
+
 
 router.delete('/:productId', productControler.deleteProductById)
 module.exports=router;

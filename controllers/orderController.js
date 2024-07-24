@@ -51,11 +51,11 @@ const getOrder = async (req, res) => {
 
     try {
         if (!mongoose.Types.ObjectId.isValid(userId)) {
-            console.log('Invalid userId:', userId);
+            // console.log('Invalid userId:', userId);
             return res.status(400).json({ error: 'Invalid userId' });
         }
 
-        console.log('Fetching order data for userId:', userId);
+        // console.log('Fetching order data for userId:', userId);
         const objectId = new mongoose.Types.ObjectId(userId);
 
         const orders = await Order.find({ userId: objectId }).populate({
@@ -82,7 +82,7 @@ const deleteOrder = async (req, res) => {
         const deletedOrder = await Order.findByIdAndDelete(orderId);
 
         if (!deletedOrder) {
-            console.log('Order not found with orderId:', orderId);
+            // console.log('Order not found with orderId:', orderId);
             return res.status(404).json({ error: 'Order not found' });
         }
 

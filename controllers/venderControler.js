@@ -25,7 +25,7 @@ const venderRegister = async (req, res) => {
     await newVender.save();
 
     res.status(200).json({ message: "register succuesfully...!" });
-    console.log("Register");
+    // console.log("Register");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "internal server error" });
@@ -47,7 +47,7 @@ const venderLogin = async (req, res) => {
     const venderId = vender._id;
 
     res.status(200).json({ message: "login successfully", token, venderId });
-    console.log(email, "this is token:", token);
+    // console.log(email, "this is token:", token);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "internal server error" });
@@ -68,18 +68,20 @@ const getAllVenders = async (req, res) => {
 
 const singleVender = async (req, res) => {
   const venderId = req.params.venderId;
-
+  console.log(venderId)
   try {
-    const singleValue = await Vender.findById(venderId).populate("firm");
+    const singleValue = await Vender.findById(venderId).populate('firm');
+    console.log(singleValue)
     if (!singleValue) {
       res.status(404).json({ message: "vender not found" });
     }
 
     const vendorFirmId = singleValue.firm[0]._id;
     const VenderBrandName = singleValue.firm[0].brandName;
-    console.log(vendorFirmId);
+    // console.log(vendorFirmId);
     res.status(200).json({ venderId, vendorFirmId,singleValue,VenderBrandName });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: "internal server error" });
   }
 };
