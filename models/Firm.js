@@ -31,7 +31,7 @@ type:[
    products:[
     {
         type:mongoose.Schema.Types.ObjectId,
-         ref:'product'
+         ref:'Product'
     }
 ]
 

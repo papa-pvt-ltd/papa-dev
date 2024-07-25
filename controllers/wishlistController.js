@@ -8,6 +8,7 @@ const addToWishlist = async (req, res) => {
     const productId = req.params.productId;
     const { userId } = req.body;
 
+    
     if (!userId || !productId) {
         return res.status(400).json({ error: 'User ID and Product ID are required' });
     }
@@ -53,4 +54,23 @@ const getWishList = async (req, res) => {
     }
 };
 
-module.exports = { addToWishlist , getWishList};
+
+
+    const deleteWishlist = async (req, res) => {
+        const wishlistId = req.params.wishlistId;
+    
+        try {
+            const deletedWishlist = await WishList.findByIdAndDelete(wishlistId);
+    
+            if (!deletedWishlist) {
+                return res.status(404).json({ error: 'Wishlist not found' });
+            }
+    
+            res.status(200).json({ message: 'Wishlist deleted successfully', deletedWishlist });
+        } catch (error) {
+            console.error('Error deleting wishlist:', error);
+            res.status(500).json({ error: 'Error deleting wishlist' });
+        }
+    };
+
+module.exports = { addToWishlist , getWishList, deleteWishlist};

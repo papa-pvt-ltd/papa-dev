@@ -17,10 +17,7 @@ const addTocart = async (req, res) => {
             cartItem = new Cart({ userId, productId, productname, price });
             
         }
-       
-
-
-        await cartItem.save();
+               await cartItem.save();
         res.send('Product added to cart');
     } catch (error) {
         console.error('Error adding product to cart:', error);
