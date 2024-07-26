@@ -66,45 +66,22 @@ app.use('/contact', contactRouter);
 app.use('/wishlist', wishlistRouter);
 
 app.get('/apii/search', async (req, res) => {
-    const query = req.query.q ? req.query.q.toLowerCase() : '';
-    console.log('Search Query:', query);
-
-    try {
-        const results = await Product.find({
-            name: { $regex: query, $options: 'i' } // Case-insensitive search
-        });
-        console.log('Search Results:', results);
-        res.json({ results });
-    } catch (error) {
-        console.error('Error fetching search results:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
-});
-
-// Add sample products endpoint
-app.get('/apii/search', async (req, res) => {
     const query = req.query.q ? req.query.q.toLowerCase().trim() : '';
-    console.log('Search Query:', query);
+
 
     try {
-        // Debugging: Ensure the query string is correct
-        console.log('Searching for products with name:', query);
-
         const results = await Product.find({
-            name: { $regex: new RegExp(query, 'i') } // Ensure case-insensitive search
+            productname: { $regex: new RegExp(query, 'i') } // Ensure case-insensitive search
         });
 
-        // Debugging: Log the number of results found
-        console.log('Number of Results Found:', results.length);
-        console.log('Search Results:', results);
-
+        console.log('Search Results:', results); // Log the results
         res.json({ results });
-        
     } catch (error) {
         console.error('Error fetching search results:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 
 // Health Check Endpoint
