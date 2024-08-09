@@ -22,12 +22,19 @@ const ProductSchema = mongoose.Schema({
     },
     image:{
         type:String,
+        required:true
     },
     age:{
         type:String,
+        required:true
     },
     gender:{
         type:String,
+        required:true
+    },
+    stock:{
+        type:String,
+        required:true
     },
     firm:[
         {

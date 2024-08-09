@@ -1,7 +1,10 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+
+// Import routes
 const firmRoutes = require("./routes/firmRoutes");
 const VenderRoute = require('./routes/venderRoute');
 const productRoute = require('./routes/productRouter');
@@ -13,11 +16,11 @@ const orderRouter = require('./routes/orderRoutes');
 const contactRouter = require('./routes/contactRoutes');
 const wishlistRouter = require('./routes/wishlistRoutes');
 const Product = require('./models/Product'); // Use the correct name for the model
-
+const aadhaarRoutes = require('./routes/aadhaarRoutes');
+const panRoutes = require('./routes/panRoutes');
+const captureRoutes = require('./routes/captureImageRoutes');
 const paymentRoute = require('./routes/paymentRoutes');
-
-const cors = require('cors');
-const path = require('path');
+const fingerprintRoute = require('./routes/fingerprintRoutes');
 
 const app = express();
 
@@ -38,21 +41,14 @@ mongoose.connect(MONGO_URI, {
 });
 
 // Middleware
-app.use(bodyParser.json());
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true }));
-
-const requireAuth = (req, res, next) => {
-    if (req.isAuthenticated()) {
-      return next(); // User is authenticated, proceed to the next middleware
-    }
-    res.redirect('/login'); // Redirect to login page if not authenticated
-};
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+app.use('/fingerprint', fingerprintRoute);
 app.use('/vender', VenderRoute);
 app.use('/firm', firmRoutes);
 app.use('/product', productRoute);
@@ -64,10 +60,13 @@ app.use('/address', addressRouter);
 app.use('/order', orderRouter);
 app.use('/contact', contactRouter);
 app.use('/wishlist', wishlistRouter);
+app.use('/aadhaar', aadhaarRoutes);
+app.use('/pan', panRoutes);
+app.use('/capture', captureRoutes);
 
+// Search Endpoint
 app.get('/apii/search', async (req, res) => {
     const query = req.query.q ? req.query.q.toLowerCase().trim() : '';
-
 
     try {
         const results = await Product.find({
@@ -81,8 +80,6 @@ app.get('/apii/search', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
-
 
 // Health Check Endpoint
 app.get('/health', (req, res) => {
@@ -102,5 +99,5 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server running successfully at ${PORT}`);
+    console.log(`Server running successfully at http://localhost:${PORT}`);
 });

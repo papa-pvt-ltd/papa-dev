@@ -10,7 +10,7 @@ const AddAddress = async(req,res)=>{
     const user = await User.findById(userId);
 
    
-// console.log(user)
+
     try {
 
         if(!user){

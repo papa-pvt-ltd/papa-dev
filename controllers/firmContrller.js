@@ -11,17 +11,18 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
-
 const upload = multer({ storage: storage });
 
 const addFirm = async (req, res) => {
   try {
     const { brandName, category, offer } = req.body;
+    console.log(req.body)
     const image = req.file ? req.file.filename : undefined;
 
     const vender = await Vender.findById(req.venderId);
 
     if (!vender) {
+      console.log(vender)
       return res.status(404).json({ message: "Vender not found" });
     }
 
@@ -43,7 +44,7 @@ const addFirm = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "Firm added successfully", firmId: savedFirm._id });
+      .json({ message: "Firm added successfully", firmId: savedFirm._id , vendorFirmName:savedFirm.brandName});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

@@ -1,20 +1,35 @@
 const express = require('express');
-const productControler = require('../controllers/productControler');
+const path = require('path');
+const multer = require('multer');
+const productController = require('../controllers/productControler');
 
 const router = express.Router();
 
-router.post('/add-product/:firmId',productControler.addProduct);
-router.get('/:firmId/products',productControler.getProductByFirm)
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '..', 'uploads'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage });
 
-router.get('/uploads/:imageName',(req,res)=>{
-    const imageName = req.params.imageName;
-    res.headersSent('Content-type','image/jpeg');
-    res.sendFile(path.join(--__dirname, '..', 'uploads', imageName))
-})
+// Routes
+router.post('/add-product/:firmId', productController.addProduct);
+router.get('/:firmId/products', productController.getProductByFirm);
 
-router.get('/allProducts',productControler.getAllProducts);
-router.get('/singleproduct',productControler.getSingleProduct);
+router.get('/uploads/:imageName', (req, res) => {
+  const imageName = req.params.imageName;
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(path.join(__dirname, '..', 'uploads', imageName));
+});
 
+router.get('/allProducts', productController.getAllProducts);
+router.get('/singleproduct', productController.getSingleProduct);
 
-router.delete('/:productId', productControler.deleteProductById)
-module.exports=router;
+router.delete('/:productId', productController.deleteProductById);
+router.put('/editproduct/:productId', upload.single('image'), productController.EditProduct);
+
+module.exports = router;

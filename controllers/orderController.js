@@ -6,23 +6,43 @@ const moment = require('moment');
 
 
 const AddOrder = async (req, res) => {
-    const { userId, productIds, paymentMode, deliveryExpected,totalAmount } = req.body;
+    const { userId, productIds, paymentMode, deliveryExpected, totalAmount, referenceNum } = req.body;
     const orderPlaced = moment().format('YYYY-MM-DD HH:mm:ss');
 
-    // Logging the received productIds
     try {
-       
+        // Iterate over each product in productIds and update the stock
+        for (let i = 0; i < productIds.length; i++) {
+            const { productId, quantity } = productIds[i];
 
+            // Find the product in your database by productId and update its stock
+            const product = await Product.findById(productId); // Replace Product with your actual model
+            if (!product) {
+                throw new Error(`Product with ID ${productId} not found`);
+            }
 
+            // Check if the stock is sufficient
+            if (product.stock < quantity) {
+                return res.status(400).json({ error: `Insufficient stock for product ID ${productId}` });
+            }
+
+            // Decrease the stock by the quantity ordered
+            product.stock -= quantity;
+
+            // Save the updated product back to the database
+            await product.save();
+        }
+
+        // Create a new order instance
         const order = new Order({
             totalAmount,
             userId,
-            productIds,
+            productIds, // This will now contain productId and quantity for each product
             paymentMode,
             deliveryExpected,
             orderId: generateOrderId(),
             orderStatus: 'Order Confirmed',
-            orderPlaced
+            orderPlaced,
+            referenceNum
         });
 
         // Save the order to the database
@@ -35,6 +55,8 @@ const AddOrder = async (req, res) => {
         res.status(500).json({ error: 'Error placing order' });
     }
 };
+
+
 
 // Helper function to generate orderId (example implementation)
 const generateOrderId = () => {

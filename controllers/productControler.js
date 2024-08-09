@@ -17,7 +17,8 @@ const upload = multer({ storage: storage });
 
 const addProduct = async (req, res) => {
   try {
-    const { productname, price, category, bestseller, description,age , gender } = req.body;
+    const { productname, price, category, bestseller, description,age , gender,stock } = req.body;
+    // console.log(req.body)
     const image = req.file ? req.file.filename : undefined;
 
     const firmId = req.params.firmId;
@@ -36,9 +37,11 @@ const addProduct = async (req, res) => {
       image,
       age,
       gender,
+      stock,
       firm: firm._id,
+      
     });
-
+// console.log(product)
     const savedProducts = await product.save();
     firm.products.push(savedProducts);
 
@@ -48,6 +51,52 @@ const addProduct = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "internal age server  error" });
+  }
+};
+
+
+const EditProduct = async (req, res) => {
+  try {
+    const productId = req.params.productId; // Get the product ID from request params
+    console.log(productId)
+    const { productname, price, category, bestseller, description, age, gender, stock } = req.body;
+    console.log(req.body)
+    if (!productId) {
+      return res.status(400).json({ error: "Product ID is required" });
+    }
+
+    // Find the existing product by ID
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Update product fields with the new values
+    if (productname) product.productname = productname;
+    if (price) product.price = price;
+    if (category) product.category = category;
+    if (bestseller) product.bestseller = bestseller;
+    if (description) product.description = description;
+    if (age) product.age = age;
+    if (gender) product.gender = gender;
+    if (stock) product.stock = stock;
+
+    // Handle image upload
+    if (req.file) {
+      product.image = req.file.filename;
+    }
+
+    // Save the updated product
+    const updatedProduct = await product.save();
+  
+  
+
+
+    // Respond with the updated product
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -99,7 +148,7 @@ const deleteProductById = async (req, res) => {
 const getSingleProduct = async (req , res )=>{
   try {
     const productId = req.query.productId;;
-   
+  
     const actualProduct = await Product.findById(productId)
     if(!actualProduct){
       return res.status(404).json({error:"No Product Matched you provided by id"})
@@ -115,5 +164,6 @@ module.exports = {
   getProductByFirm,
   deleteProductById,
   getAllProducts,
-  getSingleProduct
+  getSingleProduct,
+  EditProduct
 };

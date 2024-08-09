@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+
 
 const OrderSchema = new mongoose.Schema({
     totalAmount:{
@@ -33,10 +35,16 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    referenceNum:{
+        type: String,
+        required:true,
+        unique: true
+    }
   
-    // Other fields as necessary
+    
 });
 
+OrderSchema.plugin(uniqueValidator);
 
 const Order = mongoose.model('Order', OrderSchema);
 
