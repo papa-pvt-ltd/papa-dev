@@ -54,6 +54,50 @@ const venderLogin = async (req, res) => {
   }
 };
 
+
+const changePassword = async (req, res) => {
+  console.log('venderId',req.body.venderId)
+  const { venderId, password } = req.body;
+  try {
+    const passwordUser = await Vender.findById(venderId);
+    if (!passwordUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    passwordUser.password = hashedPassword;
+    await passwordUser.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  const { email, username } = req.body;
+  const venderId = req.params.venderId;
+console.log(venderId)
+console.log(email,username)
+  try {
+    const updateUser = await Vender.findById(venderId);
+    if (!updateUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    updateUser.email = email;
+    updateUser.username = username;
+    // updateUser.phone = phone; // Update phone if applicable
+
+    await updateUser.save();
+
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 const getAllVenders = async (req, res) => {
   try {
     const venders = await Vender.find().populate("firm");
@@ -86,4 +130,4 @@ const singleVender = async (req, res) => {
   }
 };
 
-module.exports = { venderRegister, venderLogin, getAllVenders, singleVender };
+module.exports = { venderRegister, venderLogin, getAllVenders, singleVender , changePassword , updateProfile};

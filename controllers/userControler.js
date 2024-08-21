@@ -122,3 +122,4 @@ console.log(email,username)
 };
 
 module.exports = { userRegister, userLogin, getAllUsers, singleUser,changePassword,updateProfile };
+

@@ -21,6 +21,7 @@ const panRoutes = require('./routes/panRoutes');
 const captureRoutes = require('./routes/captureImageRoutes');
 const paymentRoute = require('./routes/paymentRoutes');
 const fingerprintRoute = require('./routes/fingerprintRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use('/wishlist', wishlistRouter);
 app.use('/aadhaar', aadhaarRoutes);
 app.use('/pan', panRoutes);
 app.use('/capture', captureRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Search Endpoint
 app.get('/apii/search', async (req, res) => {

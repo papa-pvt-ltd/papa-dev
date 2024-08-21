@@ -97,6 +97,147 @@ const getOrder = async (req, res) => {
 };
 
 
+const getOrderByVender = async (req, res) => {
+    const firmId = req.query.firmId;
+
+    try {
+        if (!firmId || !mongoose.Types.ObjectId.isValid(firmId)) {
+            return res.status(400).json({ error: 'Invalid or missing firmId' });
+        }
+
+        const firmIdObjectId = new mongoose.Types.ObjectId(firmId);
+
+        // Fetch orders and populate productId within productIds
+        const orders = await Order.aggregate([
+            {
+                $lookup: {
+                    from: 'products', // Ensure this matches the actual collection name
+                    localField: 'productIds.productId',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $unwind: '$productIds'
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'productIds.productId',
+                    foreignField: '_id',
+                    as: 'productIds.productDetails'
+                }
+            },
+            {
+                $unwind: '$productIds.productDetails'
+            },
+            {
+                $match: {
+                    'productIds.productDetails.firm': firmIdObjectId
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    totalAmount: { $first: '$totalAmount' },
+                    userId: { $first: '$userId' },
+                    orderId: { $first: '$orderId' },
+                    orderStatus: { $first: '$orderStatus' },
+                    deliveryExpected: { $first: '$deliveryExpected' },
+                    orderPlaced: { $first: '$orderPlaced' },
+                    paymentMode: { $first: '$paymentMode' },
+                    referenceNum: { $first: '$referenceNum' },
+                    productIds: { 
+                        $addToSet: {
+                            productId: '$productIds.productId',
+                            quantity: '$productIds.quantity',
+                            productDetails: '$productIds.productDetails'
+                        }
+                    }
+                }
+            }
+        ]);
+
+        // Log the populated and filtered orders for debugging
+        console.log("Filtered orders:", orders);
+
+        if (orders.length === 0) {
+            return res.status(404).json({ error: 'No orders found' });
+        } else {
+            res.json(orders);
+        }
+    } catch (error) {
+        console.error('Error fetching order data:', error);
+        res.status(500).json({ error: 'Error fetching order data' });
+    }
+};
+
+
+const getAllOrder = async (req, res) => {
+    try {
+        // Fetch orders and populate productId within productIds
+        const orders = await Order.aggregate([
+            {
+                $lookup: {
+                    from: 'products', // Ensure this matches the actual collection name
+                    localField: 'productIds.productId',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $unwind: '$productIds'
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'productIds.productId',
+                    foreignField: '_id',
+                    as: 'productIds.productDetails'
+                }
+            },
+            {
+                $unwind: '$productIds.productDetails'
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    totalAmount: { $first: '$totalAmount' },
+                    userId: { $first: '$userId' },
+                    orderId: { $first: '$orderId' },
+                    orderStatus: { $first: '$orderStatus' },
+                    deliveryExpected: { $first: '$deliveryExpected' },
+                    orderPlaced: { $first: '$orderPlaced' },
+                    paymentMode: { $first: '$paymentMode' },
+                    referenceNum: { $first: '$referenceNum' },
+                    productIds: { 
+                        $push: {
+                            productId: '$productIds.productId',
+                            quantity: '$productIds.quantity',
+                            productDetails: '$productIds.productDetails'
+                        }
+                    }
+                }
+            }
+        ]);
+
+        // Log the populated and filtered orders for debugging
+        console.log("Filtered orders:", orders);
+
+        if (orders.length === 0) {
+            return res.status(404).json({ error: 'No orders found' });
+        } else {
+            res.json(orders);
+        }
+    } catch (error) {
+        console.error('Error fetching order data:', error);
+        res.status(500).json({ error: 'Error fetching order data' });
+    }
+};
+
+
+
+
 const deleteOrder = async (req, res) => {
     const orderId = req.params.orderId;
 
@@ -116,4 +257,4 @@ const deleteOrder = async (req, res) => {
 };
 
 
-module.exports = { AddOrder, getOrder,deleteOrder };
+module.exports = { AddOrder, getOrder,deleteOrder,getOrderByVender,getAllOrder };
